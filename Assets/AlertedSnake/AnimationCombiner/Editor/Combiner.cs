@@ -1,3 +1,11 @@
+/*
+
+Animation Combiner - a simple Unity script to combine animation clips
+
+Copyright (c) 2023 Michael Stella
+
+*/
+
 using System;
 using System.Collections;
 using System.Collections.Generic;

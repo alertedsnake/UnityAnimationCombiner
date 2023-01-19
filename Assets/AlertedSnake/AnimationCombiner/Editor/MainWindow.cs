@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*
+
+Animation Combiner - a simple Unity script to combine animation clips
+
+Copyright (c) 2023 Michael Stella
+
+*/
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -22,7 +30,6 @@ namespace AlertedSnake.AnimationCombiner
             _sourceClips = new List<AnimationClip>();
         }
 
-
         [MenuItem("Window/AlertedSnake/Animation Combiner")]
         public static void ShowWindow() {
             // Show existing window instance. If one doesn't exist, make one.
@@ -44,17 +51,23 @@ namespace AlertedSnake.AnimationCombiner
             EditorGUILayout.Space();
         }
 
+        // Draw a list field
         private static bool DrawListField<type>(List<type> list) where type : UnityEngine.Object {
+            // an add button
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Add", EditorStyles.miniButton))
+            if (GUILayout.Button("Add Clip", EditorStyles.miniButton)) {
                 list.Add(null);
-            if (GUILayout.Button("Remove", EditorStyles.miniButton))
-                if (list.Count > 0)
-                    list.RemoveAt(list.Count - 1);
+            }
             GUILayout.EndHorizontal();
 
+            // each item in the list gets a little row but also a close button
             for (int i = 0; i < list.Count; i++) {
+                GUILayout.BeginHorizontal();
                 list[i] = (type)EditorGUILayout.ObjectField(list[i], typeof(type), false);
+                if (GUILayout.Button("x", EditorStyles.miniButton)) {
+                    list.RemoveAt(i);
+                }
+                GUILayout.EndHorizontal();
             }
             return false;
         }
@@ -63,9 +76,11 @@ namespace AlertedSnake.AnimationCombiner
             
             _targetAnimation = EditorGUILayout.ObjectField(
                 "Target Animation", _targetAnimation, typeof(AnimationClip), true) as AnimationClip;
+            EditorGUILayout.Space();
 
             GUILayout.Label("Source Animations", EditorStyles.boldLabel);
             DrawListField<AnimationClip>(_sourceClips);
+
         }
 
         private void ApplyOptions() {
@@ -79,9 +94,11 @@ namespace AlertedSnake.AnimationCombiner
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
             MainOptions();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
             ApplyOptions();
 
-            if (GUILayout.Button("Combine")) {
+            if (GUILayout.Button("Combine Clips")) {
                 combiner.Combine();
             }
 
