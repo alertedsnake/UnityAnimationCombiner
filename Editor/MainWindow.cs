@@ -98,7 +98,11 @@ namespace AlertedSnake.AnimationCombiner
             ApplyOptions();
 
             if (GUILayout.Button("Combine Clips")) {
-                combiner.Combine();
+                if (combiner.Combine()) {
+                    // clear input form on success
+                    _targetAnimation = null;
+                    _sourceClips.Clear();
+                }
             }
 
             EditorGUILayout.EndScrollView();

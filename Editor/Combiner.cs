@@ -61,10 +61,10 @@ namespace AlertedSnake.AnimationCombiner
         }
 
 
-        public void Combine() {
+        public bool Combine() {
             if (_sourceClips.Count <= 0) {
                 Debug.LogWarning("No source clips provided, nothing to do.");
-                return;
+                return false;
             }
 
             Undo.IncrementCurrentGroup();
@@ -79,6 +79,7 @@ namespace AlertedSnake.AnimationCombiner
 
             AssetDatabase.SaveAssets();
             Undo.CollapseUndoOperations(undoGroupIndex);
+            return true;
         }
     }
 }
