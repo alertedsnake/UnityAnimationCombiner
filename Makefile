@@ -1,16 +1,21 @@
 VERSION = $(shell awk '/^v[0-9]/ {print $$1; exit }' CHANGELOG.md)
 TARGET = AnimationCombiner-$(VERSION).unitypackage
+BUILDDIR = .tmp/Assets/AlertedSnake/AnimationCombiner
 
 all: build
 
 version:
 	@echo $(VERSION)
 
-Assets/AlertedSnake/AnimationCombiner/Editor/Version.cs: CHANGELOG.md
+Editor/Version.cs: CHANGELOG.md
 	@sed -i 's/VERSION = ".*"/VERSION = "$(VERSION)"/' $@
 
 
-$(TARGET): Assets/AlertedSnake/AnimationCombiner/Editor/Version.cs
+$(TARGET): Editor/Version.cs
+	mkdir -p $(BUILDDIR)
+	ls | grep -v "Assets" | xargs -i{} cp -a {} $(BUILDDIR)
+	.github/workflows/generate_meta.sh 46616ff29ab1c264ebabb2c69a364ea4 .tmp/Assets/AlertedSnake
+	.github/workflows/generate_meta.sh 598d5ab811680e94c9025eb0ddeb7c72 .tmp/Assets/AlertedSnake/AnimationCombiner.meta
 
 	# build the unity package
 	cup -c 2 -o $@ -s .tmp
@@ -29,3 +34,6 @@ clean:
 	rm -f $(TARGET)
 	rm -rf .tmp
 .PHONY: clean
+
+
+# Thanks to SophieBlueVR for the Makefile skeleton!

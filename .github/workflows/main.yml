@@ -1,0 +1,49 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Details
+        id: details
+        run: |
+          version=$(awk '/^v[0-9]/ { print $1; exit }' CHANGELOG.md)
+          echo "version=${version}" >> $GITHUB_ENV
+          grep -zPo -e "(?s)${version}.*?\n-*?\n\n.*?\n\n" CHANGELOG.md | tail -n +3 >> .release_notes
+
+      - name: Setup Package
+        run: |
+          TARGET=Assets/AlertedSnake/AnimationCombiner
+          mkdir -p $TARGET
+          ls | grep -v "Assets" | xargs -i{} mv {} $TARGET
+          .github/workflows/generate_meta.sh 46616ff29ab1c264ebabb2c69a364ea4 .tmp/Assets/AlertedSnake
+          .github/workflows/generate_meta.sh 598d5ab811680e94c9025eb0ddeb7c72 .tmp/Assets/AlertedSnake/AnimationCombiner.meta
+          find Assets -type f -name \*.meta >> metaList
+
+      - name: Create package
+        uses: pCYSl5EDgo/create-unitypackage@master
+        with:
+          package-path: 'AnimationCombiner-${{ env.version }}.unitypackage'
+          include-files: metaList
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: "AnimationCombiner ${{ env.version }}"
+          body_path: .release_notes
+          files: |
+            AnimationCombiner-${{ env.version }}.unitypackage
