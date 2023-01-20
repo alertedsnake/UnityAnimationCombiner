@@ -1,0 +1,8 @@
+# editor stuff
+.*.swp
+.*.swo
+.idea/
+.vscode/
+
+# unity
+*.unitypackage
